@@ -5,11 +5,12 @@ import pandas as pd
 import numpy as np
 
 url = "https://www.imdb.com/search/title/?groups=top_1000&ref_=adv_prv"
-
-results = requests.get(url)
+headers = {"Accept-Language": "en-US, en;q=0.5"}
+results = requests.get(url, headers=headers)
 
 soup = BeautifulSoup(results.text, "html.parser")
 
+#initiate data storage
 titles = []
 years = []
 time = []
@@ -55,28 +56,18 @@ for container in movie_div:
     grosses = nv[1].text if len(nv) > 1 else '-'
     us_gross.append(grosses)
 
-print(titles)
-print(years)
-print(time)
-print(imdb_ratings)
-print(metascores)
-print(votes)
-print(us_gross)
-
+#pandas dataframe        
 movies = pd.DataFrame({
-    'movie': titles,
-    'year': years,
-    'timeMin': time,
-    'imdb': imdb_ratings,
-    'metascore': metascores,
-    'votes': votes,
-    'us_grossMillions': us_gross,
+'movie': titles,
+'year': years,
+'timeMin': time,
+'imdb': imdb_ratings,
+'metascore': metascores,
+'votes': votes,
+'us_grossMillions': us_gross,
 })
 
-print(movies)
-
-# clean the data!
-print(movies.dtypes)  # check data types
+# cleaning data
 # go into movies dataframe year column, extract digits and cast as integer
 movies['year'] = movies['year'].str.extract('(\d+)').astype(int)
 movies['timeMin'] = movies['timeMin'].str.extract('(\d+)').astype(int)
@@ -90,4 +81,5 @@ movies['us_grossMillions'] = pd.to_numeric(
 print(movies)
 print(movies.dtypes)
 
+#add dataframe to csv file named 'movies.csv'
 movies.to_csv('movies.csv')
